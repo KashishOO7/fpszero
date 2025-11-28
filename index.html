@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="Content-Security-Policy" 
+      content="default-src 'self'; 
+               script-src 'self' 'unsafe-inline'; 
+               style-src 'self' 'unsafe-inline'; 
+               img-src 'self' data:; 
+               media-src 'self'; 
+               connect-src 'self';">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FPSZERO | Cosmic Engine</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div id="labels-container"></div>
+
+    <header id="main-header">
+        <div class="logo">
+            <a href="#" data-view="HOME">
+                <img src="Artifacts/logo.png" alt="FPSZERO" class="brand-logo">
+            </a>
+        </div>
+        <nav id="main-nav" class="main-nav"></nav>
+    </header>
+
+    <div id="home-ui" class="ui-panel">
+        <h1 id="main-title">The First Principle Synthesis</h1>
+        <form id="search-form">
+            <input type="text" id="search-input" placeholder="Fast travel to a project..." autocomplete="off">
+            <button type="submit">→</button>
+        </form>
+        <div id="suggestions-box"></div>
+    </div>
+
+    <div id="kiosk-container" class="ui-panel hidden">
+        <iframe src="terminal.html"></iframe>
+    </div>
+
+    <div id="content-panel" class="ui-panel hidden">
+        <div id="content-inner">
+            <h2 id="content-title"></h2>
+            <div id="content-body"></div>
+        </div>
+    </div>
+
+    <div id="project-info-panel" class="hidden">
+        <h2 id="project-title"></h2>
+        <p id="project-description"></p>
+        <div id="project-ctas"></div>
+    </div>
+
+    <button id="back-button" class="hidden">&larr; Return</button>
+
+    <div id="audio-player"></div>
+
+    <script src="./modules/vendor/gsap.min.js"></script>
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "./modules/vendor/three.module.js",
+            "three/addons/": "./modules/vendor/jsm/"
+        }
+    }
+    </script>
+    
+    <script type="module" src="script.js"></script>
+</body>
+<div id="mobile-gate">
+        <div class="gate-content">
+            <img src="Artifacts/logo.png" alt="FPSZERO" class="gate-logo">
+            <h1>INTERFACE RESTRICTED</h1>
+            <p>
+                Mobile uplink detected. Bandwidth insufficient for high-fidelity neural simulation.
+            </p>
+            <div class="gate-warning">
+                [ERR_DISPLAY_LIMIT]: 3D GRAPHICS ENGINE REQUIRES DESKTOP VIEWPORT
+            </div>
+            <p class="gate-sub">
+                Please access <strong>FPSZERO.COM</strong> via a desktop browser for full system authorization.
+            </p>
+        </div>
+    </div>
+</html>
