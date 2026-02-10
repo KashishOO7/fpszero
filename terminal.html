@@ -5,113 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FPSZERO Terminal</title>
     <style>
-        body {
-            background-color: transparent;
-            color: #00ff00;
-            font-family: 'Courier New', Courier, monospace;
-            margin: 0;
-            padding: 0; /* Handled by container */
-            overflow-x: hidden;
-            font-size: 16px;
-            line-height: 1.4;
-            text-shadow: 0 0 4px rgba(0, 255, 0, 0.4);
-            height: 100vh;
-            width: 100vw;
-            box-sizing: border-box;
-            cursor: text;
-        }
-        
-        /* Scanline effect */
-        body::after {
-            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 4px; z-index: 2; pointer-events: none;
-        }
+    ::-webkit-scrollbar {
+        width: 8px; 
+    }
+    ::-webkit-scrollbar-track {
+        background: #000; 
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #004400; 
+        border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+        background: #00ff00; 
+    }
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: #004400 #000000;
+    }
 
-        #terminal-container { 
-            max-width: 1200px; /* Prevents spanning too wide */
-            width: 90%;
-            margin: 0 auto;
-            /* Padding top prevents text from overlapping the main site header/logo */
-            padding-top: 120px; 
-            padding-bottom: 50px;
-        }
+    body {
+        background-color: transparent;
+        color: #00ff00;
+        font-family: 'Courier New', Courier, monospace;
+        margin: 0;
+        padding: 0; 
+        overflow-x: hidden;
+        font-size: 16px;
+        line-height: 1.4;
+        text-shadow: 0 0 4px rgba(0, 255, 0, 0.4);
+        height: 100vh;
+        width: 100vw;
+        box-sizing: border-box;
+        cursor: text;
+    }
+    body::after {
+        content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
+        background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
+        background-size: 100% 4px; z-index: 2; pointer-events: none;
+    }
 
-        /* Input Layout */
-        #input-line {
-            display: flex;
-            align-items: center;
-            margin-top: 10px;
-            position: relative;
-            z-index: 3;
-        }
+    #terminal-container { 
+        max-width: 1200px;
+        width: 90%;
+        margin: 0 auto;
+        padding-top: 140px; 
+        padding-bottom: 50px;
+        padding-right: 20px;
+    }
+    #input-line {
+        display: flex;
+        align-items: center;
+        margin-top: 10px;
+        position: relative;
+        z-index: 3;
+    }
 
-        .prompt { 
-            color: #00ff00; 
-            font-weight: bold; 
-            white-space: nowrap;
-            margin-right: 10px;
-        }
+    .prompt { 
+        color: #00ff00; 
+        font-weight: bold; 
+        white-space: nowrap;
+        margin-right: 10px;
+    }
 
-        #command-input {
-            background: transparent; 
-            border: none; 
-            color: #fff; /* Input text white for contrast */
-            font-family: inherit; 
-            font-size: inherit; 
-            flex-grow: 1;
-            outline: none; 
-            padding: 0;
-            margin: 0;
-            opacity: 1;
-        }
+    #command-input {
+        background: transparent; 
+        border: none; 
+        color: #fff; 
+        font-family: inherit; 
+        font-size: inherit; 
+        flex-grow: 1;
+        outline: none; 
+        padding: 0;
+        margin: 0;
+        opacity: 1;
+    }
 
-        /* Password masking */
-        #command-input.password-mode {
-            -webkit-text-security: square;
-            letter-spacing: 3px;
-            color: #00ff00;
-        }
+    #command-input.password-mode {
+        -webkit-text-security: square;
+        letter-spacing: 3px;
+        color: #00ff00;
+    }
 
-        /* --- LOG STYLING --- */
-        .log-line { 
-            margin-bottom: 4px; 
-            word-wrap: break-word; 
-        }
-        
-        /* UPDATED: Minimalist User Command Style */
-        .command-history {
-            color: #fff; 
-            font-weight: bold; 
-            background: transparent; /* Removed the green box background */
-            border: none; 
-            padding: 2px 0; 
-            margin-top: 10px;
-            margin-bottom: 2px;
-            display: block; /* Ensures it takes its own line */
-        }
-        
-        /* Adds a small arrow before user commands */
-        .command-history::before {
-            content: "> ";
-            color: #00ff00;
-        }
-        
-        /* System Response indentation */
-        .log-line:not(.command-history) {
-            margin-left: 0; /* Removed deep indentation to save space */
-            color: #ccffcc; 
-            opacity: 0.9;
-        }
+    .log-line { 
+        margin-bottom: 4px; 
+        word-wrap: break-word; 
+    }
+    
+    .command-history {
+        color: #fff; 
+        font-weight: bold; 
+        background: transparent; 
+        border: none; 
+        padding: 2px 0; 
+        margin-top: 10px;
+        margin-bottom: 2px;
+        display: block; 
+    }
+    
+    .command-history::before {
+        content: "> ";
+        color: #00ff00;
+    }
+    
+    .log-line:not(.command-history) {
+        margin-left: 0; 
+        color: #ccffcc; 
+        opacity: 0.9;
+    }
 
-        .error { color: #ff6b6b; }
-        .dir { color: #5ebaff; font-weight: bold; }
-        .link { color: #00ffff; text-decoration: none; border-bottom: 1px dotted #00ffff; cursor: pointer; }
-        .link:hover { background: rgba(0, 255, 255, 0.2); }
-        .matrix-text { font-size: 20px; font-weight: bold; color: #00ff00; text-shadow: 0 0 8px #00ff00; }
-        
-        .hidden { display: none !important; }
-    </style>
+    .error { color: #ff6b6b; }
+    .dir { color: #5ebaff; font-weight: bold; }
+    .link { color: #00ffff; text-decoration: none; border-bottom: 1px dotted #00ffff; cursor: pointer; }
+    .link:hover { background: rgba(0, 255, 255, 0.2); }
+    .matrix-text { font-size: 20px; font-weight: bold; color: #00ff00; text-shadow: 0 0 8px #00ff00; }
+    
+    .hidden { display: none !important; }
+</style>
 </head>
 <body>
     <div id="terminal-container">
@@ -130,6 +139,6 @@
         </div>
     </div>
     
-    <script src="terminal.js"></script>
+    <script type="module" src="/src/js/terminal.js"></script>
 </body>
 </html>
