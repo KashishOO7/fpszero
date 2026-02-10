@@ -2,7 +2,8 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  base: '/fpszero/', 
+  base: './',
+  publicDir: 'Artifacts',
   build: {
     outDir: 'dist',
     chunkSizeWarningLimit: 1000,
@@ -13,7 +14,7 @@ export default defineConfig({
       },
       output: {
         manualChunks: {
-          vendor: ['three', 'gsap'] 
+          vendor: ['three', 'gsap']
         }
       }
     }
