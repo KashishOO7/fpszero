@@ -2,8 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 export default defineConfig({
-  base: './',
-  publicDir: 'Artifacts',
+  base: '/',
   build: {
     outDir: 'dist',
     chunkSizeWarningLimit: 1000,
