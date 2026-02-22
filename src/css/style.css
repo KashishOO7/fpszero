@@ -270,3 +270,8 @@ a:focus, button:focus, input:focus { outline: none; }
     #canvas-container, #labels-container, #home-ui, #content-panel, #main-header, #audio-player { display: none !important; }
     #mobile-gate { display: flex; }
 }
+
+@media (max-width: 768px) {
+    #mobile-gate { display: flex !important; }
+    .hidden-on-crawl { display: none; }
+}
