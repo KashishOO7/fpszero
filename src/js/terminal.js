@@ -146,10 +146,7 @@ const COMMANDS = {
 };
 
 function getLiveMoonTelemetry() {
-    const days = (new Date().getTime() - new Date('1970-01-07T20:35:00Z').getTime()) / 86400000;
-    const frac = (days % 29.53058867) / 29.53058867;
-    const vis = Math.round(50 * (1 - Math.cos(frac * Math.PI * 2)));
-    return `Phase: ${frac.toFixed(2)} [Vis: ${vis}%]`;
+    return localStorage.getItem('fps_moon_phase') || 'Telemetry Offline';
 }
 
 function triggerMatrixRain() {
@@ -227,9 +224,7 @@ function setupUserEnvironment(name) {
     
     fileSystem.home[username]['projects'] = projectsFolder;
     
-    if (!fileSystem.home[username]['moon_data']) {
-        fileSystem.home[username]['moon_data'] = { 'phase.txt': localStorage.getItem('fps_moon_phase') || 'Unknown' };
-    }
+    fileSystem.home[username]['moon_data'] = { 'phase.txt': localStorage.getItem('fps_moon_phase') || 'Unknown' };
     
     saveSystem(); updatePrompt();
 }
