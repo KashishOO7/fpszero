@@ -38,7 +38,7 @@ const CONFIG = {
             title: 'Establish Connection',
             body: `<p>We are currently operating in stealth mode.</p>
                    <ul>
-                       <li><a href="https://www.linkedin.com/in/kashish-charaya/" target="_blank">LinkedIn</a></li>
+                       <li><a href="https://www.linkedin.com/in/kashish-charaya/" target="_blank" rel="noopener noreferrer">LinkedIn</a></li>
                        <li><a href="mailto:lab@fpszero.com">Mail</a></li>
                    </ul>`
         }
@@ -94,6 +94,7 @@ let activeView = 'HOME';
 let activeNode = null;
 let isTransitioning = false;
 let animationFrameId = null;
+let _docClickHandler = null;
 const clock = new THREE.Clock();
 const mouse = new THREE.Vector2();
 
@@ -124,6 +125,11 @@ function cleanup() {
 
     window.removeEventListener('resize', onWindowResize);
     window.removeEventListener('mousemove', onMouseMove);
+
+    if (_docClickHandler) {
+        document.removeEventListener('click', _docClickHandler);
+        _docClickHandler = null;
+    }
 
     if (scene) {
         disposeHierarchy(scene);
@@ -175,6 +181,8 @@ function disposeHierarchy(node) {
 
 function init() {
     cleanup();
+    clock.start();
+
     localStorage.setItem('fps_data_link', JSON.stringify({ projects: CONFIG.projectsData, content: CONFIG.contentData }));
 
     scene = new THREE.Scene();
@@ -235,6 +243,7 @@ function setupUI() {
     ui.searchInput = newForm.querySelector('#search-input'); 
     ui.suggestionsBox = document.getElementById('suggestions-box');
     const searchBtn = newForm.querySelector('button');
+    
     ui.searchForm.addEventListener('submit', (e) => { 
         e.preventDefault(); 
         onSearch(e); 
@@ -263,12 +272,14 @@ function setupUI() {
         ui.headerLogo.addEventListener('click', e => { e.preventDefault(); switchView('HOME'); });
     }
     
-    document.addEventListener('click', (e) => {
+    if (_docClickHandler) document.removeEventListener('click', _docClickHandler);
+    _docClickHandler = (e) => {
         if (ui.searchForm && !ui.searchForm.contains(e.target)) {
             ui.suggestionsBox.innerHTML = '';
             ui.suggestionsBox.style.display = 'none';
         }
-    });
+    };
+    document.addEventListener('click', _docClickHandler);
 }
 
 function buildHeader() {
@@ -292,12 +303,15 @@ function buildHeader() {
 function switchView(view, options = {}) {
     if (isTransitioning) return;
     isTransitioning = true;
+    
+    const safetyTimer = setTimeout(() => { isTransitioning = false; }, 3000);
 
     if (view === 'HOME') gsap.to(ui.audioPlayer, { autoAlpha: 1, duration: 0.6 });
     else gsap.to(ui.audioPlayer, { autoAlpha: 0, duration: 0.4 });
 
     const tl = gsap.timeline({
         onComplete: () => {
+            clearTimeout(safetyTimer);
             activeView = view;
             isTransitioning = false;
             if (view === 'KIOSK') {
@@ -332,8 +346,13 @@ function switchView(view, options = {}) {
         }
 
         if (view === 'CONTENT') {
-            ui.contentTitle.innerHTML = CONFIG.contentData[options.contentKey].title;
-            ui.contentBody.innerHTML = CONFIG.contentData[options.contentKey].body;
+            const contentEntry = CONFIG.contentData[options.contentKey];
+            if (!contentEntry) {
+                console.warn('No content for key:', options.contentKey);
+            } else {
+                ui.contentTitle.innerHTML = contentEntry.title;
+                ui.contentBody.innerHTML = contentEntry.body;
+            }
         }
 
         if (view === 'KIOSK') {
@@ -362,6 +381,8 @@ function switchView(view, options = {}) {
 
 function zoomToTarget(target) {
     isTransitioning = true;
+    const safetyTimer = setTimeout(() => { isTransitioning = false; }, 3000);
+
     if (target) {
         activeNode = target;
         const targetPos = new THREE.Vector3();
@@ -377,7 +398,11 @@ function zoomToTarget(target) {
         if (data.details.ctas) {
             data.details.ctas.forEach(cta => {
                 const a = document.createElement('a');
-                a.href = cta.url; a.target = '_blank'; a.className = 'cta-button'; a.textContent = cta.label;
+                a.href = cta.url; 
+                a.target = '_blank'; 
+                a.rel = 'noopener noreferrer';
+                a.className = 'cta-button'; 
+                a.textContent = cta.label;
                 ui.projectCtas.appendChild(a);
             });
         }
@@ -394,7 +419,11 @@ function zoomToTarget(target) {
             x: finalPos.x, y: finalPos.y, z: finalPos.z,
             ease: "power2.inOut",
             onUpdate: () => camera.lookAt(targetPos),
-            onComplete: () => { isTransitioning = false; camera.lookAt(targetPos); }
+            onComplete: () => { 
+                clearTimeout(safetyTimer);
+                isTransitioning = false; 
+                camera.lookAt(targetPos); 
+            }
         });
 
     } else {
@@ -408,7 +437,10 @@ function zoomToTarget(target) {
             x: 0, y: 0, z: 80,
             ease: "power2.inOut",
             onUpdate: () => camera.lookAt(0,0,0),
-            onComplete: () => { isTransitioning = false; }
+            onComplete: () => { 
+                clearTimeout(safetyTimer);
+                isTransitioning = false; 
+            }
         });
     }
 }
