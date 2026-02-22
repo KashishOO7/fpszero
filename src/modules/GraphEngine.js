@@ -13,6 +13,21 @@ export class GraphEngine {
         
         this.pulsars = [];
         
+        this.disposables = {
+            geometries: [],
+            materials: [],
+            textures: [],
+            cssElements: []
+        };
+
+        this._clickHandler = (e) => this.handleInput(e.clientX, e.clientY);
+        this._touchHandler = (e) => {
+            if(e.touches.length > 0) {
+                const t = e.touches[0];
+                this.handleInput(t.clientX, t.clientY);
+            }
+        };
+        
         this.createGraph();
         this.addEventListeners();
     }
@@ -27,7 +42,9 @@ export class GraphEngine {
         grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
         ctx.fillStyle = grad;
         ctx.fillRect(0, 0, 64, 64);
-        const glowTexture = new THREE.CanvasTexture(canvas);
+        
+        this.glowTexture = new THREE.CanvasTexture(canvas);
+        this.disposables.textures.push(this.glowTexture);
 
         const keys = Object.keys(this.config.projectsData);
         const nodes = [];
@@ -37,17 +54,15 @@ export class GraphEngine {
             const data = this.config.projectsData[key];
             const nodeColor = data.color || 0xffffff;
             
-            // Distribute points on a sphere
             const phi = Math.acos(-1 + (2 * i) / keys.length);
             const theta = Math.sqrt(keys.length * Math.PI) * phi;
             const x = radius * Math.cos(theta) * Math.sin(phi);
             const y = radius * Math.sin(theta) * Math.sin(phi);
             const z = radius * Math.cos(phi);
 
-            const node = this.createNode(x, y, z, nodeColor, key, glowTexture);
+            const node = this.createNode(x, y, z, nodeColor, key, this.glowTexture);
             node.userData = { ...data, name: key };
             
-            // PULSAR LOGIC
             if (data.isPulsar) {
                 this.pulsars.push(node);
             }
@@ -56,14 +71,16 @@ export class GraphEngine {
             this.group.add(node);
         });
 
-        const lineMat = new THREE.LineBasicMaterial({ color: 0x555555, transparent: true, opacity: 0.2 });
+        this.lineMat = new THREE.LineBasicMaterial({ color: 0x555555, transparent: true, opacity: 0.2 });
+        this.disposables.materials.push(this.lineMat); // Track shared line material
+        
         for(let i=0; i<nodes.length; i++) {
             for(let j=i+1; j<nodes.length; j++) {
-                // Connect if close enough
                 const dist = nodes[i].position.distanceTo(nodes[j].position);
                 if (dist < 40) {
                     const geo = new THREE.BufferGeometry().setFromPoints([nodes[i].position, nodes[j].position]);
-                    this.group.add(new THREE.Line(geo, lineMat));
+                    this.disposables.geometries.push(geo); // Track individual line geometry
+                    this.group.add(new THREE.Line(geo, this.lineMat));
                 }
             }
         }
@@ -73,13 +90,19 @@ export class GraphEngine {
 
     createNode(x, y, z, color, labelText, texture) {
         const geo = new THREE.SphereGeometry(1.0, 16, 16);
+        this.disposables.geometries.push(geo); // Track mesh geometry
+
         const mat = new THREE.MeshBasicMaterial({ color: color });
+        this.disposables.materials.push(mat); // Track mesh material
+        
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(x, y, z);
 
         const spriteMat = new THREE.SpriteMaterial({
             map: texture, color: color, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending
         });
+        this.disposables.materials.push(spriteMat); // Track sprite material
+        
         const sprite = new THREE.Sprite(spriteMat);
         sprite.scale.set(8, 8, 1);
         mesh.add(sprite);
@@ -89,6 +112,7 @@ export class GraphEngine {
         div.textContent = labelText;
         const label = new CSS2DObject(div);
         label.position.set(0, 2.5, 0); 
+        this.disposables.cssElements.push(div); // Track DOM element
         
         const trigger = (e) => { e.stopPropagation(); this.onNodeSelect(mesh); };
         div.addEventListener('click', trigger);
@@ -99,13 +123,8 @@ export class GraphEngine {
     }
 
     addEventListeners() {
-        window.addEventListener('click', (e) => this.handleInput(e.clientX, e.clientY));
-        window.addEventListener('touchstart', (e) => {
-            if(e.touches.length > 0) {
-                const t = e.touches[0];
-                this.handleInput(t.clientX, t.clientY);
-            }
-        }, { passive: false });
+        window.addEventListener('click', this._clickHandler);
+        window.addEventListener('touchstart', this._touchHandler, { passive: false });
     }
 
     handleInput(x, y) {
@@ -122,20 +141,36 @@ export class GraphEngine {
     }
 
     cleanup() {
-        this.group.traverse(c => {
-            if (c.isCSS2DObject && c.element) c.element.remove();
-        });
-        this.scene.remove(this.group);
+        // Remove window listeners
+        window.removeEventListener('click', this._clickHandler);
+        window.removeEventListener('touchstart', this._touchHandler);
+
+        // Safely dispose of tracked resources only
+        this.disposables.geometries.forEach(geo => geo.dispose());
+        this.disposables.materials.forEach(mat => mat.dispose());
+        this.disposables.textures.forEach(tex => tex.dispose());
+        this.disposables.cssElements.forEach(el => el.remove());
+
+        // Empty tracking arrays
+        this.disposables.geometries = [];
+        this.disposables.materials = [];
+        this.disposables.textures = [];
+        this.disposables.cssElements = [];
+        this.pulsars = [];
+
+        // Remove from scene
+        if (this.group) {
+            this.scene.remove(this.group);
+            this.group = null;
+        }
     }
     
     update(delta, time, shouldRotate) {
-        // Rotate entire group slowly
-        if (shouldRotate) {
+        if (shouldRotate && this.group) {
             this.group.rotation.y += delta * 0.05;
             this.group.rotation.x = Math.sin(time * 0.2) * 0.05;
         }
 
-        // Animate Pulsars (Heartbeat effect)
         const pulse = 1.0 + Math.sin(time * 3.0) * 0.3; 
         this.pulsars.forEach(p => {
             p.scale.setScalar(pulse);
