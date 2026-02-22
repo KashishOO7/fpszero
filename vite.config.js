@@ -1,8 +1,8 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
-export default defineConfig({
-  base: '/',
+export default defineConfig(({ command }) => ({
+  base: command === 'serve' ? '/' : process.env.DEPLOY_TARGET === 'pages' ? '/fpszero/' : '/', 
   build: {
     outDir: 'dist',
     chunkSizeWarningLimit: 1000,
@@ -13,7 +13,7 @@ export default defineConfig({
       },
       output: {
         manualChunks: {
-          vendor: ['three', 'gsap']
+          vendor: ['three', 'gsap'] 
         }
       }
     }
@@ -22,4 +22,4 @@ export default defineConfig({
     port: 3000,
     open: true
   }
-});
+}));
