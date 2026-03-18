@@ -2,25 +2,31 @@
 
 > "What I cannot create, I do not understand." — Richard Feynman
 
-Research lab and personal site. The work here focuses on cybersecurity,
-computational physics, and the overlap between the two.
+Open-source research lab and personal site. If I don't understand something, I build it myself.
+Work spans cybersecurity, computational physics, and the overlap between the two.
 
-[![Status](https://img.shields.io/badge/OPERATIONAL-OMEGA--7-00ff00?style=for-the-badge&logo=terminator)](https://fpszero.com)
+[![Status](https://img.shields.io/badge/OPERATIONAL-OMEGA--7-00ff00?style=for-the-badge)](https://fpszero.com)
 [![Focus](https://img.shields.io/badge/FOCUS-ADVERSARIAL_DEFENSE-ff0055?style=for-the-badge)](https://fpszero.com)
 
 ---
 
-## Active: Anti-Phishing Ecosystem
+## Live: Spectra
+**→ [spectra.fpszero.com](https://spectra.fpszero.com)**
+
+Local-first security audit tool with threat-model-weighted scoring.
+Built in SvelteKit. No telemetry. No cloud. Runs entirely on your machine.
+
+---
+
+## Active Formation: Identity Defense Grid
 **Status:** Stealth / Active Development
 
 Phishing is not a technical flaw — it is a cognitive exploit.
 Most defenses treat it like a URL problem. They are wrong.
 
-Building a browser-based detection engine that identifies
-semantic irregularities in real-time using local multi-headed
-attention models. No data leaves the device.
-
-- Zero Latency. Zero PII Involvement. First Principles Privacy.
+Building a browser-based detection engine that identifies semantic
+irregularities in real-time using local multi-headed attention models.
+No data leaves the device. Zero PII involvement.
 
 ---
 
@@ -31,12 +37,20 @@ attention models. No data leaves the device.
 ---
 
 ## Site: fpszero.com
-Built on Vanilla JS and WebGL (Three.js).
-No frameworks. No abstraction layers I do not control.
+Built on Vanilla JS and WebGL (Three.js + GSAP).
 
 - Moon phase and position calculated in real-time from UTC
   celestial mechanics — not a static asset.
 - Terminal Gateway: a functional shell for direct system interaction.
+- 3D graph engine: interactive node visualization of all active systems.
+
+---
+
+## Knowledge Base
+**→ [lab.fpszero.com](https://lab.fpszero.com)**
+
+Open-source knowledge repository covering cybersecurity and deep tech.
+Built with MkDocs + Material theme.
 
 ---
 

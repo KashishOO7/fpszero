@@ -73,10 +73,18 @@ const CONFIG = {
                 ctas: [ { label: 'Read Manifesto', url: '#' } ]
             }
         },
+        'Spectra': {
+            color: 0x00ff88,
+            isPulsar: true,
+            details: {
+                description: "STATUS: LIVE [PULSAR].\n\nMost security tools give everyone the same checklist. Spectra weights your exposure against your actual adversaries.\n\nAudit your digital, physical, and operational posture. Graph-mapped. Scored in real-time. Nothing leaves your browser.",
+                ctas: [ { label: 'Launch Spectra', url: 'https://spectra.fpszero.com' }, { label: 'View Source', url: 'https://github.com/KashishOO7/spectra/' } ]
+            }
+        },
         'FPSZERO Origin': {
             color: 0xffffff, 
             details: {
-                description: "THE SINGULARITY.\n\nAn open-source research environment built on First Principles.\n\nNo frameworks. No black boxes. Just Math and Code.",
+                description: "THE SINGULARITY.\n\nAn open-source research environment built on First Principles.\n\nIf I don't understand it, I build it myself. Every layer, examined. Every system, decoded.",
                 ctas: [ { label: 'View Source', url: 'https://github.com/KashishOO7/fpszero' } ]
             }
         }
@@ -131,10 +139,7 @@ function cleanup() {
         _docClickHandler = null;
     }
 
-    if (scene) {
-        disposeHierarchy(scene);
-        scene = null;
-    }
+    scene = null;
 
     if (renderer) {
         renderer.dispose();
@@ -153,31 +158,14 @@ function cleanup() {
         labelRenderer.domElement.parentNode.removeChild(labelRenderer.domElement);
     }
 
-    if (cosmos && typeof cosmos.dispose === 'function') cosmos.dispose();
-    if (graphEngine && typeof graphEngine.cleanup === 'function') graphEngine.cleanup();
+    if (cosmos) cosmos.dispose();
+    if (graphEngine) graphEngine.cleanup();
     
     cosmos = null;
     moon = null;
     graphEngine = null;
 }
 
-function disposeHierarchy(node) {
-    if (!node) return;
-    if (node.geometry) node.geometry.dispose();
-    if (node.material) {
-        if (Array.isArray(node.material)) {
-            node.material.forEach(m => m.dispose());
-        } else {
-            node.material.dispose();
-        }
-    }
-    if (node.children) {
-        for (let i = node.children.length - 1; i >= 0; i--) {
-            disposeHierarchy(node.children[i]);
-            node.remove(node.children[i]);
-        }
-    }
-}
 
 function init() {
     cleanup();
@@ -198,14 +186,15 @@ function init() {
         stencil: false,
         depth: true
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); 
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor(0x000000, 1);
+    renderer.shadowMap.enabled = true;
     document.getElementById('canvas-container').appendChild(renderer.domElement);
 
     const renderScene = new RenderPass(scene, camera);
     const bloomPass = new UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-    bloomPass.threshold = 0;
+    bloomPass.threshold = 0.1;
     bloomPass.strength = 0.8; 
     bloomPass.radius = 0.5;
 
@@ -490,8 +479,8 @@ function onSearch(e) {
         }});
 
         setTimeout(() => {
-            ui.searchForm.style.borderColor = 'rgba(100, 150, 255, 0.15)'; 
-            ui.searchForm.style.boxShadow = 'none';
+            ui.searchForm.style.borderColor = '';
+            ui.searchForm.style.boxShadow = '';
         }, 1000);
     }
 }

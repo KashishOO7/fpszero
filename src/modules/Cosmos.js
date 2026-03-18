@@ -76,7 +76,7 @@ export class Cosmos {
                     float twinkle = 1.5 + (shift / 50.0);
                     vOpacity = 0.6 + 0.4 * sin(uTime * twinkle + shift);
                     
-                    vColor = color; // Built-in attribute
+                    vColor = color;
                 }
             `,
             fragmentShader: `

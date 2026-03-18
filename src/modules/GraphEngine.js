@@ -72,14 +72,14 @@ export class GraphEngine {
         });
 
         this.lineMat = new THREE.LineBasicMaterial({ color: 0x555555, transparent: true, opacity: 0.2 });
-        this.disposables.materials.push(this.lineMat); // Track shared line material
+        this.disposables.materials.push(this.lineMat);
         
         for(let i=0; i<nodes.length; i++) {
             for(let j=i+1; j<nodes.length; j++) {
                 const dist = nodes[i].position.distanceTo(nodes[j].position);
                 if (dist < 40) {
                     const geo = new THREE.BufferGeometry().setFromPoints([nodes[i].position, nodes[j].position]);
-                    this.disposables.geometries.push(geo); // Track individual line geometry
+                    this.disposables.geometries.push(geo);
                     this.group.add(new THREE.Line(geo, this.lineMat));
                 }
             }
@@ -90,10 +90,10 @@ export class GraphEngine {
 
     createNode(x, y, z, color, labelText, texture) {
         const geo = new THREE.SphereGeometry(1.0, 16, 16);
-        this.disposables.geometries.push(geo); // Track mesh geometry
+        this.disposables.geometries.push(geo);
 
         const mat = new THREE.MeshBasicMaterial({ color: color });
-        this.disposables.materials.push(mat); // Track mesh material
+        this.disposables.materials.push(mat);
         
         const mesh = new THREE.Mesh(geo, mat);
         mesh.position.set(x, y, z);
@@ -101,7 +101,7 @@ export class GraphEngine {
         const spriteMat = new THREE.SpriteMaterial({
             map: texture, color: color, transparent: true, opacity: 0.6, blending: THREE.AdditiveBlending
         });
-        this.disposables.materials.push(spriteMat); // Track sprite material
+        this.disposables.materials.push(spriteMat);
         
         const sprite = new THREE.Sprite(spriteMat);
         sprite.scale.set(8, 8, 1);
@@ -112,7 +112,7 @@ export class GraphEngine {
         div.textContent = labelText;
         const label = new CSS2DObject(div);
         label.position.set(0, 2.5, 0); 
-        this.disposables.cssElements.push(div); // Track DOM element
+        this.disposables.cssElements.push(div);
         
         const trigger = (e) => { e.stopPropagation(); this.onNodeSelect(mesh); };
         div.addEventListener('click', trigger);
@@ -133,7 +133,7 @@ export class GraphEngine {
         this.raycaster.setFromCamera(this.mouse, this.camera);
         
         const intersects = this.raycaster.intersectObjects(this.group.children, true);
-        const nodeHit = intersects.find(hit => hit.object.geometry && hit.object.geometry.type === 'SphereGeometry');
+        const nodeHit = intersects.find(hit => hit.object.geometry && hit.object.geometry instanceof THREE.SphereGeometry);
         
         if (nodeHit && nodeHit.object.userData.name) {
             this.onNodeSelect(nodeHit.object);
@@ -141,24 +141,20 @@ export class GraphEngine {
     }
 
     cleanup() {
-        // Remove window listeners
         window.removeEventListener('click', this._clickHandler);
         window.removeEventListener('touchstart', this._touchHandler);
 
-        // Safely dispose of tracked resources only
         this.disposables.geometries.forEach(geo => geo.dispose());
         this.disposables.materials.forEach(mat => mat.dispose());
         this.disposables.textures.forEach(tex => tex.dispose());
         this.disposables.cssElements.forEach(el => el.remove());
 
-        // Empty tracking arrays
         this.disposables.geometries = [];
         this.disposables.materials = [];
         this.disposables.textures = [];
         this.disposables.cssElements = [];
         this.pulsars = [];
 
-        // Remove from scene
         if (this.group) {
             this.scene.remove(this.group);
             this.group = null;

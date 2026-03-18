@@ -10,14 +10,14 @@ const prefix = document.getElementById('prompt-prefix');
 
 let history = [];
 let historyIndex = -1;
-let currentPath = ['home']; 
+let currentPath = ['home'];
 let fileSystem = {};
 let username = sessionStorage.getItem('fps_username') || null;
-let isMuted = localStorage.getItem('fps_mute') === 'true'; 
+let isMuted = localStorage.getItem('fps_mute') === 'true';
 let isLoginMode = false;
 let isAnimating = false;
-let matrixInterval = null; 
-const startTime = new Date(); 
+let matrixInterval = null;
+const startTime = new Date();
 let audioCtx = null;
 
 function getAudioContext() {
@@ -35,9 +35,9 @@ function escapeHTML(str) {
 function delay(ms) { return new Promise(resolve => setTimeout(resolve, ms)); }
 
 const baseSystem = {
-    'home': {}, 
-    'bin': { 
-        'ls': '[Ex]', 'cat': '[Ex]', 'pwd': '[Ex]', 'whoami': '[Ex]', 
+    'home': {},
+    'bin': {
+        'ls': '[Ex]', 'cat': '[Ex]', 'pwd': '[Ex]', 'whoami': '[Ex]',
         'date': '[Ex]', 'status': '[Ex]', 'reboot': '[Ex]', 'sound': '[Ex]',
         'uname': '[Ex]', 'uptime': '[Ex]', 'top': '[Ex]', 'history': '[Ex]',
         'mkdir': '[Ex]', 'help': '[Ex]', 'matrix': '[Ex]'
@@ -84,7 +84,7 @@ const COMMANDS = {
     },
     'reboot': () => {
         print("Initiating shutdown sequence...");
-        sessionStorage.clear(); localStorage.removeItem('fps_filesystem_v2'); 
+        sessionStorage.clear(); localStorage.removeItem('fps_filesystem_v2');
         setTimeout(() => location.reload(), 1000);
     },
     'history': () => history.forEach((cmd, i) => print(`${i + 1}  ${escapeHTML(cmd)}`)),
@@ -94,7 +94,7 @@ const COMMANDS = {
     'ls': () => {
         const dir = getDir(currentPath);
         if(!dir || typeof dir !== 'object') return;
-        
+
         const keys = Object.keys(dir).sort((a, b) => {
             const isDirA = typeof dir[a] === 'object';
             const isDirB = typeof dir[b] === 'object';
@@ -103,20 +103,25 @@ const COMMANDS = {
             return a.localeCompare(b);
         });
 
-        const items = keys.map(key => {
-            if (typeof dir[key] === 'object') return `<span class="dir">${escapeHTML(key)}/</span>`;
-            if (key.endsWith('.link')) return `<span class="link">${escapeHTML(key)}</span>`;
-            return `<span class="file">${escapeHTML(key)}</span>`;
+        const line = document.createElement('div');
+        line.className = 'log-line';
+        keys.forEach((key, i) => {
+            const span = document.createElement('span');
+            if (typeof dir[key] === 'object') { span.className = 'dir'; span.textContent = key + '/'; }
+            else if (key.endsWith('.link')) { span.className = 'link'; span.textContent = key; }
+            else { span.className = 'file'; span.textContent = key; }
+            line.appendChild(span);
+            if (i < keys.length - 1) line.appendChild(document.createTextNode('  '));
         });
-        print(items.join('  '), 'safe-html');
+        printDOM(line);
     },
     'cd': (args) => {
-        if (!args || !args[0] || args[0] === '~') { currentPath = ['home', username]; } 
-        else if (args[0] === '..') { if (currentPath.length > 0) currentPath.pop(); } 
+        if (!args || !args[0] || args[0] === '~') { currentPath = ['home', username]; }
+        else if (args[0] === '..') { if (currentPath.length > 0) currentPath.pop(); }
         else {
             const target = args[0].replace(/\/$/, '');
             const newDir = getDir([...currentPath, target]);
-            if (newDir && typeof newDir === 'object') { currentPath.push(target); } 
+            if (newDir && typeof newDir === 'object') { currentPath.push(target); }
             else { print(`cd: ${escapeHTML(target)}: No such file or directory`, 'error'); }
         }
         updatePrompt();
@@ -131,14 +136,14 @@ const COMMANDS = {
         if (!args || !args[0]) { print("usage: cat [file]"); return; }
         const fileContent = getDir(currentPath) ? getDir(currentPath)[args[0]] : null;
         if (fileContent !== undefined) {
-            if (typeof fileContent === 'object') print(`cat: ${escapeHTML(args[0])}: Is a directory`, 'error'); 
+            if (typeof fileContent === 'object') print(`cat: ${escapeHTML(args[0])}: Is a directory`, 'error');
             else {
                 if (args[0].endsWith('.link')) {
                     print(`Opening uplink...`);
                     let url = fileContent;
                     if(url.startsWith('LINK: ')) url = url.substring(6);
                     if(url.startsWith('http')) setTimeout(() => window.open(url, '_blank'), 500);
-                } else print(escapeHTML(fileContent)); 
+                } else print(escapeHTML(fileContent));
             }
         } else print(`cat: ${escapeHTML(args[0])}: No such file`, 'error');
     },
@@ -159,7 +164,7 @@ function triggerMatrixRain() {
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth; canvas.height = window.innerHeight;
     const drops = Array(Math.floor(canvas.width / 16)).fill(1);
-    
+
     const draw = () => {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#0F0'; ctx.font = '16px monospace';
@@ -170,7 +175,7 @@ function triggerMatrixRain() {
         }
     };
     matrixInterval = setInterval(draw, 30);
-    
+
     const stopMatrix = (e) => {
         if(e) { e.preventDefault(); e.stopPropagation(); }
         clearInterval(matrixInterval); matrixInterval = null;
@@ -184,29 +189,33 @@ function triggerMatrixRain() {
 function print(text, type = '') {
     const div = document.createElement('div');
     div.className = `log-line ${type}`;
-    if (type === 'safe-html') div.innerHTML = text; 
-    else if (type === 'command-history') div.innerHTML = escapeHTML(text); 
+    if (type === 'command-history') div.innerHTML = escapeHTML(text);
     else div.innerHTML = escapeHTML(text).replace(/\n/g, '<br>');
     output.appendChild(div);
+    scrollToBottom();
+}
+
+function printDOM(node) {
+    output.appendChild(node);
     scrollToBottom();
 }
 
 function setupUserEnvironment(name) {
     username = name; sessionStorage.setItem('fps_username', username);
     currentPath = ['home', username];
-    
+
     let sharedData = { projects: {}, content: {} };
     try { sharedData = JSON.parse(localStorage.getItem('fps_data_link')) || {}; } catch(e) {}
-    
+
     const projectsFolder = {};
     if(sharedData.projects) {
         Object.keys(sharedData.projects).forEach(k => {
             const safeName = k.toLowerCase().replace(/[^a-z0-9]+/g, '_');
             const projectData = sharedData.projects[k];
-            
+
             const projectContent = {};
             projectContent['brief.txt'] = `PROJECT: ${k.toUpperCase()}\n---\n${projectData.details.description || 'No data.'}`;
-            
+
             if (projectData.details.ctas) {
                 projectData.details.ctas.forEach(cta => {
                     const linkName = cta.label.toLowerCase().replace(/[^a-z0-9]+/g, '_') + '.link';
@@ -218,14 +227,13 @@ function setupUserEnvironment(name) {
     }
 
     try { fileSystem = JSON.parse(localStorage.getItem('fps_filesystem_v2')) || JSON.parse(JSON.stringify(baseSystem)); } catch { fileSystem = JSON.parse(JSON.stringify(baseSystem)); }
-    
+
     if (!fileSystem.home) fileSystem.home = {};
     if (!fileSystem.home[username]) fileSystem.home[username] = {};
-    
+
     fileSystem.home[username]['projects'] = projectsFolder;
-    
     fileSystem.home[username]['moon_data'] = { 'phase.txt': localStorage.getItem('fps_moon_phase') || 'Unknown' };
-    
+
     saveSystem(); updatePrompt();
 }
 
@@ -245,17 +253,23 @@ function handleCommand(cmd) {
 }
 
 async function runMatrixWakeUp(name) {
-    isAnimating = true; output.innerHTML = '';
-    await typeWriter(`Booting FPSZERØ...`, 60); await delay(1000); output.innerHTML = '';
-    await typeWriter(`Wake up, ${escapeHTML(name)}...`, 80); await delay(1500); output.innerHTML = '';
-    
-    await typeWriter(`The Matrix has you...`, 80); await delay(1500); output.innerHTML = '';
-    await typeWriter(`Follow the white rabbit.`, 80); await delay(1500); output.innerHTML = '';
-    
-    setupUserEnvironment(name); output.innerHTML = '';
-    print(`Identity Verified: [${escapeHTML(name)}]`); print("FPSZERO Environment Loaded.");
-    print("Type <span class='link'>'help'</span> to view commands.", 'safe-html');
-    inputContainer.classList.remove('hidden'); inputLine.focus(); isAnimating = false;
+    isAnimating = true;
+    output.innerHTML = '';
+    try {
+        await typeWriter(`Booting FPSZERØ...`, 60); await delay(1000); output.innerHTML = '';
+        await typeWriter(`Wake up, ${escapeHTML(name)}...`, 80); await delay(1500); output.innerHTML = '';
+        await typeWriter(`The Matrix has you...`, 80); await delay(1500); output.innerHTML = '';
+        await typeWriter(`Follow the white rabbit.`, 80); await delay(1500); output.innerHTML = '';
+        setupUserEnvironment(name);
+        output.innerHTML = '';
+        print(`Identity Verified: [${escapeHTML(name)}]`);
+        print('FPSZERO Environment Loaded.');
+        print("Type 'help' to view commands.");
+        inputContainer.classList.remove('hidden');
+        inputLine.focus();
+    } finally {
+        isAnimating = false;
+    }
 }
 
 function typeWriter(text, speed) {
@@ -278,13 +292,13 @@ function playTypeSound() {
     const gainNode = ctx.createGain();
     osc.connect(gainNode);
     gainNode.connect(ctx.destination);
-    
+
     osc.type = 'square';
-    osc.frequency.setValueAtTime(800 + Math.random() * 200, ctx.currentTime); 
-    gainNode.gain.setValueAtTime(0.05, ctx.currentTime); 
-    
+    osc.frequency.setValueAtTime(800 + Math.random() * 200, ctx.currentTime);
+    gainNode.gain.setValueAtTime(0.05, ctx.currentTime);
+
     osc.start();
-    osc.stop(ctx.currentTime + 0.05); 
+    osc.stop(ctx.currentTime + 0.05);
 }
 
 function saveSystem() { localStorage.setItem('fps_filesystem_v2', JSON.stringify(fileSystem)); }
@@ -320,7 +334,7 @@ function init() {
     };
     document.addEventListener('click', onClick); inputLine.addEventListener('keydown', onKeyDown);
     window.FPS_TERMINAL_CLEANUP = () => { document.removeEventListener('click', onClick); inputLine.removeEventListener('keydown', onKeyDown); if(matrixInterval) clearInterval(matrixInterval); if(audioCtx) audioCtx.close(); };
-    
+
     if (!username) {
         output.innerHTML = ''; print("FPSZERO SECURE GATEWAY v2.1"); print("---------------------------"); print("IDENTITY CONFIRMATION REQUIRED.");
         isLoginMode = true; inputContainer.classList.remove('hidden'); prefix.textContent = "CODENAME: "; inputLine.value = ''; inputLine.classList.add('password-mode'); setTimeout(() => inputLine.focus(), 50);

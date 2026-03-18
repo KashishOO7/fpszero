@@ -59,7 +59,7 @@ export class Moon {
                 'Pacific/Tongatapu', 'Pacific/Port_Moresby', 'Pacific/Noumea',
                 'America/Argentina', 'America/Buenos_Aires', 'America/Sao_Paulo',
                 'America/Santiago', 'America/Montevideo', 'America/La_Paz',
-                'America/Lima', 'America/Bogota', 'Africa/Johannesburg', 
+                'America/Lima', 'Africa/Johannesburg', 
                 'Africa/Harare', 'Africa/Maputo', 'Africa/Windhoek', 
                 'Antarctica/', 'Indian/Mauritius', 'Asia/Jakarta'
             ];
@@ -131,11 +131,11 @@ export class Moon {
         return {
             phaseName: name,
             illumination: visPercent,
-            elongation: elongation // In Degrees
+            elongation: elongation
         };
     }
 
-    update(time, delta) {
+    update(time) {
         if(this.mesh) this.mesh.lookAt(this.camera.position);
     }
 }
