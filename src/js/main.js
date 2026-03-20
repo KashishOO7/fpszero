@@ -28,7 +28,7 @@ const CONFIG = {
                 From abacus to neuromorphic computing.<br>
                 From wheels to star ship.</p>
                 <p>We observe and decode the nature, replicate it to make it available for the masses and monetize it to keep the colonization intact.</p>
-                <p>We are nature’s mirror, held up by curiosity and refined by necessity. We don’t invent. We remember what the universe already knows—and then charge subscription fees for it. Fun fact, we are the universe itself, unwrapping the reality, one frame at a time. Limitations of being 3D creatures, wanting to step in the parallel realms.</p>
+                <p>We are nature’s mirror, held up by curiosity and refined by necessity. We don’t invent. We remember what the universe already knows and then charge subscription fees for it. Fun fact, we are the universe itself, unwrapping the reality, one frame at a time. Limitations of being 3D creatures, wanting to step in the parallel realms.</p>
                 <p>Eventually, It would be better if we call ourselves Artists, pioneers, wanderers, rather than Inventors with untouched cosmic inventories.</p>
                 <p>This site is a manifestation of that impulse: a first‑principles playground proving that if you can see it in your mind, you can build it, iterate on it, and let imagination set the boundary.</p>
                 <p>One project at a time. One build at a time. Mindfully and consciously.</p>
@@ -44,33 +44,19 @@ const CONFIG = {
         }
     },
     projectsData: {
-        'Identity Defense Grid': { 
-            color: 0xff0055, 
-            isPulsar: true, 
+        'Identity Defense Grid': {
+            color: 0xff0055,
+            isPulsar: true,
             details: {
-                description: "STATUS: ACTIVE FORMATION [PULSAR].\n\nTarget: Cognitive Security & Phishing Prevention.\n\nHypothesis: Identity attacks are semantic anomalies, not just syntactic ones.\nArchitecture: Local-first Neural Nets.",
-                ctas: [ { label: 'Request Access', url: 'mailto:lab@fpszero.com' }, { label: 'System Architecture', url: '#' } ]
+                description: "STATUS: ACTIVE FORMATION [PULSAR].\n\nExploring on-device phishing detection through semantic analysis and lightweight ML.\n\nBuilding and iterating on classifier prototypes. Investigating federated approaches for training models without sharing raw data.",
+                ctas: [ { label: 'Request Access', url: 'mailto:lab@fpszero.com' } ]
             }
         },
-        'Adversarial Entropy': { 
-            color: 0xffaa00, 
+        'Adversarial Entropy': {
+            color: 0xffaa00,
             details: {
-                description: "RESEARCH SECTOR: OFFENSIVE SECURITY.\n\nStudying system fragility and chaos.\n\nFocus: Automated vulnerability discovery, LLM Jailbreaking, and Protocol Analysis.",
-                ctas: [ { label: 'Research Papers', url: '#' }, { label: 'Knowledge Database', url: 'https://github.com/KashishOO7' } ]
-            }
-        },
-        'Probabilistic Compute': { 
-            color: 0x00aaff, 
-            details: {
-                description: "RESEARCH SECTOR: DEEP TECH.\n\nMoving beyond binary logic.\n\nTopics: Quantum Algorithms, High-Dimensional Math, and Non-Deterministic Systems.",
-                ctas: [ { label: 'Quantum Notes (GitBook)', url: '#' } ]
-            }
-        },
-        'Cosmic Archetypes': { 
-            color: 0xaa00ff, 
-            details: {
-                description: "RESEARCH SECTOR: NATURAL PATTERNS.\n\nAstrology is not synthetic; it is the oldest data science.\n\nGoal: Decoding the geometric relationships between celestial mechanics and terrestrial events.",
-                ctas: [ { label: 'Read Manifesto', url: '#' } ]
+                description: "RESEARCH SECTOR: OFFENSIVE SECURITY.\n\nWhere systems break, patterns emerge.\n\nActive areas: LLM jailbreaking, protocol dissection, automated vulnerability discovery, and binary analysis.",
+                ctas: [ { label: 'Knowledge Base', url: 'https://lab.fpszero.com' } ]
             }
         },
         'Spectra': {
@@ -78,7 +64,15 @@ const CONFIG = {
             isPulsar: true,
             details: {
                 description: "STATUS: LIVE [PULSAR].\n\nMost security tools give everyone the same checklist. Spectra weights your exposure against your actual adversaries.\n\nAudit your digital, physical, and operational posture. Graph-mapped. Scored in real-time. Nothing leaves your browser.",
-                ctas: [ { label: 'Launch Spectra', url: 'https://spectra.fpszero.com' }, { label: 'View Source', url: 'https://github.com/KashishOO7/spectra/' } ]
+                ctas: [ { label: 'Launch Spectra', url: 'https://spectra.fpszero.com' }, { label: 'View Source', url: 'https://github.com/KashishOO7/spectra' } ]
+            }
+        },
+        'FPSZERO Lab': {
+            color: 0xff8800,
+            isPulsar: true,
+            details: {
+                description: "STATUS: LIVE [PULSAR].\n\nOpen knowledge base - no paywalls, no noise.\n\nRoadmaps across cybersecurity, DFIR, mobile security, CTF, quantum computing, cloud, bug bounty, reverse engineering, and AI/ML security. First-principles breakdowns of offense, defense, and deep tech.",
+                ctas: [ { label: 'Open Lab', url: 'https://lab.fpszero.com' }, { label: 'View Source', url: 'https://github.com/KashishOO7/fpszero-lab' } ]
             }
         },
         'FPSZERO Origin': {
@@ -90,9 +84,9 @@ const CONFIG = {
         }
     },
     audioTracks: [
-        { title: 'Founder Log 001: Origin', src: '' }, 
-        { title: 'Founder Log 002: The Flaw', src: '' },
-        { title: 'System Ambience: Core', src: '' }
+        { title: 'Log I', src: '' },
+        { title: 'Log II', src: '' },
+        { title: 'Log III', src: '' }
     ]
 };
 

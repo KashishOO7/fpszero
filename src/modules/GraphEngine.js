@@ -52,15 +52,13 @@ export class GraphEngine {
 
         keys.forEach((key, i) => {
             const data = this.config.projectsData[key];
-            const nodeColor = data.color || 0xffffff;
-            
             const phi = Math.acos(-1 + (2 * i) / keys.length);
             const theta = Math.sqrt(keys.length * Math.PI) * phi;
             const x = radius * Math.cos(theta) * Math.sin(phi);
             const y = radius * Math.sin(theta) * Math.sin(phi);
             const z = radius * Math.cos(phi);
 
-            const node = this.createNode(x, y, z, nodeColor, key, this.glowTexture);
+            const node = this.createNode(x, y, z, data.color || 0xffffff, key, this.glowTexture);
             node.userData = { ...data, name: key };
             
             if (data.isPulsar) {
@@ -108,7 +106,7 @@ export class GraphEngine {
         mesh.add(sprite);
 
         const div = document.createElement('div');
-        div.className = `skill-label graph-label`;
+        div.className = 'skill-label graph-label';
         div.textContent = labelText;
         const label = new CSS2DObject(div);
         label.position.set(0, 2.5, 0); 
